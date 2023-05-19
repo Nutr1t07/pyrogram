@@ -55,8 +55,15 @@ class Dispatcher:
 
     def __init__(self, client: "pyrogram.Client"):
         self.client = client
-        self.loop = asyncio.get_event_loop()
-
+        # self.loop = asyncio.get_event_loop()
+        try:
+            self.loop = asyncio.get_event_loop()
+        except RuntimeError as e:
+            if str(e).startswith('There is no current event loop in thread'):
+                self.loop = asyncio.new_event_loop()
+                asyncio.set_event_loop(self.loop)
+            else:
+                raise
         self.handler_worker_tasks = []
         self.locks_list = []
 
